@@ -1,0 +1,75 @@
+1.    Without using CTE
+
+USE [AdventureWorksDW2014]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_GetCustomersCountByProvince]    Script Date: 11/5/2021 12:19:51 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Sanjukta Samom
+-- Create date: 2012-11-04
+-- Description:	Display the highest number of customers by province with country as input parameter
+-- =============================================
+ALTER PROCEDURE [dbo].[usp_GetCustomersCountByProvince]
+	-- Add the parameters for the stored procedure here
+	@CountryName VARCHAR(20)
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;    -- Insert statements for procedure here
+	SELECT	g.StateProvinceName AS Province,
+			COUNT(c.CustomerKey) AS NoOfCustomers
+	FROM [dbo].[DimCustomer] AS c
+	INNER JOIN [dbo].[DimGeography] AS g
+	ON c.GeographyKey = g.GeographyKey
+	WHERE g.EnglishCountryRegionName = @CountryName
+	GROUP BY g.StateProvinceName
+	ORDER BY NoOfCustomers DESC
+	
+END
+
+
+
+
+2. Using CTE
+
+USE [AdventureWorksDW2014]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_GetCustomersCountByProvince_CTE]    Script Date: 11/5/2021 12:20:33 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Sanjukta Samom
+-- Create date: 2021-11-04
+-- Description:	Display the highest number of customers by province with country as input parameter using CTE
+-- =============================================
+ALTER PROCEDURE [dbo].[usp_GetCustomersCountByProvince_CTE]
+	-- Add the parameters for the stored procedure here
+	@CountryName VARCHAR(20)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;    -- Insert statements for procedure here
+	WITH GeographyByCountry
+	AS
+	(
+		SELECT	GeographyKey AS GeographyKey,
+				StateProvinceName AS ProvinceName,
+				EnglishCountryRegionName AS CountryName
+		FROM [dbo].[DimGeography]
+		WHERE [EnglishCountryRegionName] = @CountryName
+	)
+	SELECT  g.ProvinceName AS ProvinceName,
+			COUNT(c.[CustomerKey]) AS NoOfCustomers
+	FROM [dbo].[DimCustomer] c
+	INNER JOIN GeographyByCountry g ON c.GeographyKey = g.GeographyKey
+	GROUP BY g.ProvinceName
+	ORDER BY NoOfCustomers DESC
+END

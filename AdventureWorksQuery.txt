@@ -1,0 +1,67 @@
+1. Find all Products in the product category 
+SELECT *
+FROM [Production].[Product] p, [Production].[ProductSubcategory] psc, [Production].[ProductCategory] pc
+WHERE
+p.ProductSubcategoryID = psc.ProductSubcategoryID
+AND
+psc.ProductCategoryID = pc.ProductCategoryID
+AND
+pc.Name = 'Accessories'
+
+2. Find all Products that have “seat" in its name
+SELECT *
+FROM Production.Product p
+WHERE
+p.Name LIKE '%seat%'
+
+3. Find the number of products in each product category
+SELECT pc.Name,  COUNT(*) AS [No of Products]
+FROM Production.product p, Production.ProductSubcategory psc, Production.ProductCategory pc
+WHERE
+p.ProductSubcategoryID = psc.ProductSubcategoryID
+AND
+psc.ProductCategoryID = pc.ProductCategoryID
+GROUP BY pc.Name
+
+4. Find the average price of the products in each product subcategory
+SELECT psc.Name, AVG(p.ListPrice) AS [Average Price]
+FROM Production.product p, Production.ProductSubcategory psc
+WHERE
+p.ProductSubcategoryID = psc.ProductSubcategoryID
+GROUP BY psc.Name
+
+
+5. Find the orders that were made between the dates “2011 06 13” and “2011 06 18”
+SELECT *
+FROM
+Sales.SalesOrderHeader soh
+WHERE soh.OrderDate BETWEEN '13-Jun-2011' AND '18-Jun-2011'
+
+From Lincoln
+1.
+SELECT p.*
+               FROM [Production].[Product] p
+               INNER JOIN [Production].[ProductSubcategory] sc ON p.ProductSubcategoryID = sc.ProductSubcategoryID
+               INNER JOIN [Production].[ProductCategory] c ON sc.ProductCategoryID = c.ProductCategoryID
+               WHERE c.[Name] = 'Accessories'
+2.
+SELECT *
+               FROM [Production].[Product]
+               WHERE [Name] LIKE '%seat%'
+3.
+SELECT               c.[Name]                                              AS [Product Category]
+                                               ,              COUNT(p.ProductID)      AS [Product Quantity]
+               FROM [Production].[Product] p
+               INNER JOIN [Production].[ProductSubcategory] sc ON p.ProductSubcategoryID = sc.ProductSubcategoryID
+               INNER JOIN [Production].[ProductCategory] c ON sc.ProductCategoryID = c.ProductCategoryID
+               GROUP BY c.[Name]
+4.
+SELECT               sc.[Name]                                            AS [Product Subcategory]
+                                               ,              AVG(p.[ListPrice])             AS [Average Price]
+               FROM [Production].[Product] p
+               INNER JOIN [Production].[ProductSubcategory] sc ON p.ProductSubcategoryID = sc.ProductSubcategoryID
+               GROUP BY sc.[Name]
+5.
+SELECT *
+               FROM [Sales].[SalesOrderHeader]
+               WHERE OrderDate BETWEEN '2011-06-13' AND '2011-06-18'
